@@ -10,5 +10,9 @@ plugins
 *.parquet
 *.xlsx
 *.env
+*.egg-info
+*.mypy_cache
+*.pytest_cache
 
+src/reading_writing_files/py.typed
 src/reading_writing_files/*.json
