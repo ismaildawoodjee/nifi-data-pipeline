@@ -26,6 +26,10 @@ jobs:
           python -m pip install --upgrade wheel setuptools
           pip install -r requirements.txt
 
+      - name: Install docker-compose if macOs
+        if: matrix.os == 'macos-latest'
+        run: brew install docker-compose
+        
       - name: Start containers
         run: |
           docker-compose -f docker-compose-dev.yml up airflow-init
