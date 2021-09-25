@@ -10,3 +10,5 @@ plugins
 *.parquet
 *.xlsx
 *.env
+
+src/reading_writing_files/*.json

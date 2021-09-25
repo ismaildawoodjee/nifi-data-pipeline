@@ -96,7 +96,7 @@ services:
       - "5433:5432"
     volumes:
       - ./source-data:/source-data
-      - ./database-setup/sourcedb.sql:/docker-entrypoint-initdb.d/sourcedb.sql
+      # - ./database-setup/sourcedb.sql:/docker-entrypoint-initdb.d/sourcedb.sql
     healthcheck:
       test: ["CMD", "pg_isready", "-U", "sourcedb1"]
       interval: 5s
