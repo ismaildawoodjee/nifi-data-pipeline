@@ -32,6 +32,9 @@ jobs:
 
       - name: Start containers
         run: |
+          mkdir -p ./dags ./logs ./plugins
+          echo -e "AIRFLOW_UID=$(id -u)\nAIRFLOW_GID=0" > .env
+          chmod 755 ./dags/* ./logs ./plugins
           docker-compose -f docker-compose-dev.yml up airflow-init
           docker-compose -f docker-compose-dev.yml up -d
 
