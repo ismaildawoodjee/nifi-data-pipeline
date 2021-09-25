@@ -1,0 +1,5 @@
+docker system prune; docker volume prune; docker network prune
+docker-compose -f .\docker-compose-dev.yml up airflow-init
+docker-compose -f .\docker-compose-dev.yml up -d
+
+docker-compose -f .\docker-compose-dev.yml down -v

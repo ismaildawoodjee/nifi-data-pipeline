@@ -1,0 +1,12 @@
+.venv
+.vscode
+__pycache__
+
+temp
+logs
+plugins
+
+*.csv
+*.parquet
+*.xlsx
+*.env

@@ -1,0 +1,182 @@
+version: "3"
+x-airflow-common: &airflow-common
+  image: apache/airflow:latest-python3.8
+  environment: &airflow-common-env
+    AIRFLOW__CORE__EXECUTOR: LocalExecutor
+    AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres-airflow/airflow
+    AIRFLOW__CORE__FERNET_KEY: ""
+    AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "false"
+    AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+    AIRFLOW__API__AUTH_BACKEND: "airflow.api.auth.backend.basic_auth"
+    _PIP_ADDITIONAL_REQUIREMENTS: ${_PIP_ADDITIONAL_REQUIREMENTS:-}
+    AIRFLOW_CONN_POSTGRES_DEFAULT: postgres://airflow:airflow@postgres-airflow:5432/airflow
+  volumes:
+    - ./dags:/opt/airflow/dags
+    - ./logs:/opt/airflow/logs
+    - ./plugins:/opt/airflow/plugins
+  user: "${AIRFLOW_UID:-50000}:${AIRFLOW_GID:-0}"
+  depends_on: &airflow-common-depends-on
+    postgres-airflow:
+      condition: service_healthy
+    postgres-source:
+      condition: service_healthy
+
+services:
+  # Apache Nifi
+  nifi:
+    image: apache/nifi:latest
+    container_name: apache-nifi
+    restart: unless-stopped
+    ports:
+      - "8443:8443"
+    volumes:
+      - ./drivers:/opt/nifi/nifi-current/drivers
+    environment:
+      SINGLE_USER_CREDENTIALS_USERNAME: nifi
+      SINGLE_USER_CREDENTIALS_PASSWORD: apachenifipassword
+
+  # Elasticsearch
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.14.1
+    container_name: elasticsearch
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    volumes:
+      - type: bind
+        source: ./config/elasticsearch.yml
+        target: /usr/share/elasticsearch/config/elasticsearch.yml
+        read_only: true
+      - type: volume
+        source: elasticsearch
+        target: /usr/share/elasticsearch/data
+    environment:
+      ES_JAVA_OPTS: "-Xmx256m -Xms256m"
+      ELASTIC_PASSWORD: elastic
+      discovery.type: single-node
+
+  # Kibana
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.14.1
+    container_name: kibana
+    ports:
+      - "5601:5601"
+    volumes:
+      - type: bind
+        source: ./config/kibana.yml
+        target: /usr/share/kibana/config/kibana.yml
+        read_only: true
+
+  # pgAdmin
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin-de
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-admin@admin.com}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    volumes:
+       - pgadmin:/var/lib/pgadmin
+    ports:
+      - "${PGADMIN_PORT:-5050}:80"
+    restart: unless-stopped
+
+  postgres-source: 
+    image: postgres:latest
+    container_name: postgres-source
+    environment:
+      POSTGRES_USER: sourcedb1
+      POSTGRES_PASSWORD: sourcedb1
+      POSTGRES_DB: sourcedb
+    logging:
+      options:
+        max-size: 10m
+        max-file: "3"
+    ports:
+      - "5433:5432"
+    volumes:
+      - ./source-data:/source-data
+      - ./database-setup/sourcedb.sql:/docker-entrypoint-initdb.d/sourcedb.sql
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "sourcedb1"]
+      interval: 5s
+      retries: 5
+    restart: always
+
+  # Apache Airflow
+  postgres-airflow:
+    image: postgres:latest
+    container_name: postgres-airflow
+    environment:
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: airflow
+      POSTGRES_DB: airflow
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "airflow"]
+      interval: 5s
+      retries: 5
+    restart: always
+
+  airflow-webserver:
+    container_name: airflow-webserver
+    <<: *airflow-common
+    command: webserver
+    ports:
+      - 8080:8080
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+    restart: always
+    depends_on:
+      <<: *airflow-common-depends-on
+      airflow-init:
+        condition: service_completed_successfully
+
+  airflow-scheduler:
+    container_name: airflow-scheduler
+    <<: *airflow-common
+    command: scheduler
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          'airflow jobs check --job-type SchedulerJob --hostname "$${HOSTNAME}"',
+        ]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+    restart: always
+    depends_on:
+      <<: *airflow-common-depends-on
+      airflow-init:
+        condition: service_completed_successfully
+
+  airflow-init:
+    container_name: airflow-init
+    <<: *airflow-common
+    command: version
+    environment:
+      <<: *airflow-common-env
+      _AIRFLOW_DB_UPGRADE: "true"
+      _AIRFLOW_WWW_USER_CREATE: "true"
+      _AIRFLOW_WWW_USER_USERNAME: ${_AIRFLOW_WWW_USER_USERNAME:-airflow}
+      _AIRFLOW_WWW_USER_PASSWORD: ${_AIRFLOW_WWW_USER_PASSWORD:-airflow}
+
+  airflow-cli:
+    <<: *airflow-common
+    profiles:
+      - debug
+    environment:
+      <<: *airflow-common-env
+      CONNECTION_CHECK_MAX_COUNT: "0"
+    # Workaround for entrypoint issue. See: https://github.com/apache/airflow/issues/16252
+    command:
+      - bash
+      - -c
+      - airflow
+
+volumes:
+  elasticsearch:
+  pgadmin:
