@@ -5,6 +5,8 @@ def write_to_csv():
 
     df = pd.read_csv("fake_data.csv")
 
+    print(df.head())
+
     data = {
         "Name": ["Elizabeth", "Aaron", "Emily", "Wanda"],
         "Age": [65, 32, 53, 78],

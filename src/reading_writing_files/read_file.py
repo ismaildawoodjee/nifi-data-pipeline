@@ -8,6 +8,8 @@ def read_fake_data():
         reader = csv.DictReader(file)
 
         header = next(reader)
+
+        print(header)
         for row in reader:
             print(row["name"])
 

@@ -5,6 +5,7 @@ __pycache__
 temp
 logs
 plugins
+htmlcov
 
 *.csv
 *.parquet
@@ -13,6 +14,8 @@ plugins
 *.egg-info
 *.mypy_cache
 *.pytest_cache
+*.typed
+.coverage
+.tox
 
-src/reading_writing_files/py.typed
-src/reading_writing_files/*.json
+src/**/*.json
