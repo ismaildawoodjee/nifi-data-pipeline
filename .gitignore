@@ -19,3 +19,4 @@ htmlcov
 .tox
 
 src/**/*.json
+src/**/from_pipeline/

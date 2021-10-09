@@ -3,7 +3,7 @@ from faker import Faker
 import csv
 import os
 
-filepath = "/home/airflow/src/csv_to_json"
+filepath = "/home/airflow/src/chapter3"
 
 
 def generate_fake_data():
@@ -42,4 +42,4 @@ def convert_csv_to_json():
     for _, row in df.iterrows():
         print(row["name"])
 
-    df.to_json(os.path.join(filepath, "fake_data.csv"), orient="records")
+    df.to_json(os.path.join(filepath, "from_airflow.json"), orient="records")

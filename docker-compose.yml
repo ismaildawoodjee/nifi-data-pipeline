@@ -33,6 +33,7 @@ services:
       - "8443:8443"
     volumes:
       - ./drivers:/opt/nifi/nifi-current/drivers
+      - ./src:/home/nifi/src
     environment:
       SINGLE_USER_CREDENTIALS_USERNAME: nifi
       SINGLE_USER_CREDENTIALS_PASSWORD: apachenifipassword
