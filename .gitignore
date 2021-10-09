@@ -6,6 +6,8 @@ temp
 logs
 plugins
 htmlcov
+build
+dist
 
 *.csv
 *.parquet
