@@ -757,7 +757,7 @@
                 <properties>
                     <entry>
                         <key>Input Directory</key>
-                        <value>/home/nifi/src/csv_to_json</value>
+                        <value>/home/nifi/sourcefiles/csv_to_json</value>
                     </entry>
                     <entry>
                         <key>File Filter</key>
@@ -888,7 +888,7 @@
                 <properties>
                     <entry>
                         <key>Directory</key>
-                        <value>/home/nifi/src/csv_to_json</value>
+                        <value>/home/nifi/sourcefiles/csv_to_json</value>
                     </entry>
                     <entry>
                         <key>Conflict Resolution Strategy</key>

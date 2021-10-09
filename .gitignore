@@ -20,5 +20,5 @@ dist
 .coverage
 .tox
 
-src/**/*.json
-src/**/from_pipeline/
+sourcefiles/**/*.json
+sourcefiles/**/from_pipeline/

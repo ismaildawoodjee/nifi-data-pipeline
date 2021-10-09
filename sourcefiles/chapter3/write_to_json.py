@@ -3,7 +3,7 @@ from faker import Faker
 import csv
 import os
 
-filepath = "/home/airflow/src/chapter3"
+filepath = "/home/airflow/sourcefiles/chapter3"
 
 
 def generate_fake_data():

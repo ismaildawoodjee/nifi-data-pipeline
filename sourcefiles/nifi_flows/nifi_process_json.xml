@@ -1165,7 +1165,7 @@
                 <properties>
                     <entry>
                         <key>Input Directory</key>
-                        <value>/home/nifi/src/chapter3</value>
+                        <value>/home/nifi/sourcefiles/chapter3</value>
                     </entry>
                     <entry>
                         <key>File Filter</key>
@@ -1483,7 +1483,7 @@
                 <properties>
                     <entry>
                         <key>Directory</key>
-                        <value>/home/nifi/src/chapter3/from_pipeline</value>
+                        <value>/home/nifi/sourcefiles/chapter3/from_pipeline</value>
                     </entry>
                     <entry>
                         <key>Conflict Resolution Strategy</key>

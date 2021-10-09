@@ -15,7 +15,7 @@ x-airflow-common: &airflow-common
     - ./dags:/opt/airflow/dags
     - ./logs:/opt/airflow/logs
     - ./plugins:/opt/airflow/plugins
-    - ./src:/home/airflow/src
+    - ./sourcefiles:/home/airflow/sourcefiles
   user: "${AIRFLOW_UID:-50000}:${AIRFLOW_GID:-0}"
   depends_on: &airflow-common-depends-on
     postgres-airflow:
@@ -33,7 +33,7 @@ services:
       - "8443:8443"
     volumes:
       - ./drivers:/opt/nifi/nifi-current/drivers
-      - ./src:/home/nifi/src
+      - ./sourcefiles:/home/nifi/sourcefiles
     environment:
       SINGLE_USER_CREDENTIALS_USERNAME: nifi
       SINGLE_USER_CREDENTIALS_PASSWORD: apachenifipassword
@@ -77,14 +77,14 @@ services:
     environment:
       PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-admin@admin.com}
       PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
-      PGADMIN_CONFIG_SERVER_MODE: 'False'
+      PGADMIN_CONFIG_SERVER_MODE: "False"
     volumes:
-       - pgadmin:/var/lib/pgadmin
+      - pgadmin:/var/lib/pgadmin
     ports:
       - "${PGADMIN_PORT:-5050}:80"
     restart: unless-stopped
 
-  postgres-source: 
+  postgres-source:
     image: postgres:latest
     container_name: postgres-source
     environment:

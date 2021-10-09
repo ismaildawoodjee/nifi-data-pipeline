@@ -7,8 +7,8 @@ from airflow.operators.bash_operator import BashOperator
 from airflow.operators.python_operator import PythonOperator
 from airflow.operators.dummy_operator import DummyOperator
 
-# import Python modules (my own modules) from `src` folder
-from src import csv_to_json as c2j
+# import Python modules (my own modules) from `sourcefiles` folder
+from sourcefiles import csv_to_json as c2j
 
 # DAG arguments
 default_args = {
